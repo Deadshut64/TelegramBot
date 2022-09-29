@@ -1,6 +1,5 @@
 package ru.kids.bot;
 
-import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.helpCommand.HelpCommand;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -10,7 +9,6 @@ import ru.kids.configuration.BotProperties;
 
 import java.util.List;
 
-@Component
 public class Bot extends TelegramLongPollingCommandBot {
 
     private final BotProperties properties;
