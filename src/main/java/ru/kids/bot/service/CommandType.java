@@ -1,4 +1,4 @@
-package ru.kids.bot.command;
+package ru.kids.bot.service;
 
 public enum CommandType {
     SHOW_USERS("show_users", "Все пользователи");

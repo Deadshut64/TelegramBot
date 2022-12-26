@@ -1,4 +1,4 @@
-package ru.kids.bot.command;
+package ru.kids.bot.service;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;

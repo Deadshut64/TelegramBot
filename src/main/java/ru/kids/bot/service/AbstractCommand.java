@@ -1,4 +1,4 @@
-package ru.kids.bot.command;
+package ru.kids.bot.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.DefaultBotCommand;
