@@ -17,17 +17,14 @@ import javax.annotation.PostConstruct;
 @ConditionalOnProperty(value = "bot-configuration.enabled-production", havingValue = "true", matchIfMissing = true)
 public class ConfigBot {
 
-    @Bean
-    public Bot bot(BotProperties botProperties){
-        return new Bot(botProperties);
-    }
+    private final BotProperties botProperties;
 
     @PostConstruct
     public void init() {
         TelegramBotsApi botsApi;
         try {
             botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot();
+            botsApi.registerBot(new Bot(botProperties));
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
