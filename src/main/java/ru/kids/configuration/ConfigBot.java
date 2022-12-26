@@ -1,10 +1,7 @@
 package ru.kids.configuration;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -18,17 +15,14 @@ import javax.annotation.PostConstruct;
 @ConditionalOnProperty(value = "bot-configuration.enabled-production", havingValue = "true", matchIfMissing = true)
 public class ConfigBot {
 
-    @Autowired
-    public Bot Bot(BotProperties botProperties){
-        return new Bot(botProperties);
-    }
+    private final BotProperties botProperties;
 
     @PostConstruct
-    public void init(Bot bot) {
+    public void init() {
         TelegramBotsApi botsApi;
         try {
             botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(bot);
+            botsApi.registerBot(new Bot(botProperties));
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
