@@ -63,13 +63,13 @@ public class Bot extends TelegramLongPollingCommandBot {
                     case "/start":
                         testCommand(chatID,u.getMessage().getChat().getFirstName());
                         break;
-                    default: sendMessage(chatID,"Sorry, something went wrong");
+                    default: sendMessage(chatID,"Извините, данная команда не поддерживается");
                 }
             }
         }
     }
     private void testCommand(long chatID, String name){
-        String answer = "Hi " + name + "you are stupid";
+        String answer = "Здраствуйте " + name + ", выберите пожалуйста пол ребенка";
         sendMessage(chatID,answer);
     }
     private void sendMessage(long chatID, String text){
