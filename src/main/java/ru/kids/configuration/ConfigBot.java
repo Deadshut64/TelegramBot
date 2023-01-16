@@ -10,6 +10,8 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.kids.bot.Bot;
+import ru.kids.bot.model.CustomerRepository;
+
 import javax.annotation.PostConstruct;
 
 @Slf4j
@@ -19,13 +21,14 @@ import javax.annotation.PostConstruct;
 public class ConfigBot {
 
     private final BotProperties botProperties;
+    private final CustomerRepository customerRepository;
 
     @PostConstruct
     public void init() {
         TelegramBotsApi botsApi;
         try {
             botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(new Bot(botProperties));
+            botsApi.registerBot(new Bot(botProperties, customerRepository));
         } catch (TelegramApiException e) {
             log.error("error occurred: " + e.getMessage());
         }
