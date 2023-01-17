@@ -1,5 +1,9 @@
-create table users
+CREATE TABLE customers
 (
-  id    uuid primary key,
-  login varchar not null
-);
+    customer_name text  NOT NULL,
+    chat_id bigint NOT NULL,
+    basket text,
+    amount integer,
+    registration timestamp without time zone,
+    CONSTRAINT customers_pkey PRIMARY KEY (chat_id)
+)

@@ -24,13 +24,14 @@ public class ConfigBot {
     private final CustomerRepository customerRepository;
 
     @PostConstruct
-    public void init() {
+    public void init() throws TelegramApiException {
         TelegramBotsApi botsApi;
         try {
             botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(new Bot(botProperties, customerRepository));
         } catch (TelegramApiException e) {
             log.error("error occurred: " + e.getMessage());
+            throw e;
         }
     }
 }
