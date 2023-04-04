@@ -1,0 +1,11 @@
+version: "3.5"
+services:
+  postgres-kids-bot:
+    hostname: postgres-kids-bot
+    image: "postgres:14"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
