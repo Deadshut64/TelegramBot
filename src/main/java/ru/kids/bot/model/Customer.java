@@ -12,7 +12,6 @@ import java.sql.Timestamp;
 public class Customer {
     @Id
     private Long chat_id;
-    private int customer_id;
     private String customer_name;
     private String basket;
     private int amount;
@@ -22,7 +21,6 @@ public class Customer {
     public String toString() {
         return "Customer{" +
                 "chat_id=" + chat_id +
-                ", customer_id=" + customer_id +
                 ", customer_name='" + customer_name + '\'' +
                 ", basket='" + basket + '\'' +
                 ", amount=" + amount +

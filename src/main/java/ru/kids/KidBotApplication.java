@@ -9,5 +9,6 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 public class KidBotApplication {
     public static void main(String[] args) {
         SpringApplication.run(KidBotApplication.class, args);
+
     }
 }

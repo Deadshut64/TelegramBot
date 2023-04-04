@@ -97,9 +97,14 @@ public class Bot extends TelegramLongPollingCommandBot {
 
       Customer customer = new Customer();
       customer.setChat_id(chatId);
+      if (customer.getCustomer_name() == null){
+        customer.setCustomer_name("дорогой друг");
+        customer.setRegistration(new Timestamp(System.currentTimeMillis()));
+        customerRepository.save(customer);
+        log.info("Пользователь " + customer + "сохранен");
+      }
       customer.setCustomer_name(chat.getUserName());
       customer.setRegistration(new Timestamp(System.currentTimeMillis()));
-
       customerRepository.save(customer);
       log.info("Пользователь " + customer + "сохранен");
     }
