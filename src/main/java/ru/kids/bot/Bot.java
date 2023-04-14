@@ -9,7 +9,9 @@ import org.telegram.telegrambots.extensions.bots.commandbot.commands.helpCommand
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.kids.bot.model.Customer;
@@ -86,7 +88,11 @@ public class Bot extends TelegramLongPollingCommandBot {
           case "/filterseason":
           case "/deletedata":
           case "/man":
+            filterMan(chatID);
+            break;
           case "/woman":
+            filterWoman(chatID);
+            break;
           case "/mydata":
             break;
           default:
@@ -123,8 +129,9 @@ public class Bot extends TelegramLongPollingCommandBot {
     String answer = EmojiParser.parseToUnicode("Здраствуйте " + name + " :blush:, выберите пожалуйста пол ребенка ");
     if (name == null) {
       sendMessage(chatID, EmojiParser.parseToUnicode("Здраствуйте :blush:, выберите пожалуйста пол ребенка "));
+    } else {
+      sendMessage(chatID, answer);
     }
-    sendMessage(chatID, answer);
   }
 
   private void helpCommand(long chatID) {
@@ -153,14 +160,20 @@ public class Bot extends TelegramLongPollingCommandBot {
 
   private void keyboardGender(long chatID, String text) {
     SendMessage sendMessage = new SendMessage(String.valueOf(chatID), text);
-    ReplyKeyboardMarkup replyKeyboard = new ReplyKeyboardMarkup();
-     List<KeyboardRow> keyboardRows = new ArrayList<>();
-      KeyboardRow row = new KeyboardRow();
-        row.add("Мальчик");
-        row.add("Девочка");
-      keyboardRows.add(row);
-     replyKeyboard.setKeyboard(keyboardRows);
-    sendMessage.setReplyMarkup(replyKeyboard);
+    InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+     List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+      List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+         var buttonMan = new InlineKeyboardButton();
+             buttonMan.setText("Мальчик");
+             buttonMan.setCallbackData("Man");
+         var buttonWoman = new InlineKeyboardButton();
+             buttonWoman.setText("Девочка");
+             buttonWoman.setCallbackData("Woman");
+         rowInLine.add(buttonMan);
+         rowInLine.add(buttonWoman);
+        rowsInLine.add(rowInLine);
+    keyboardMarkup.setKeyboard(rowsInLine);
+    sendMessage.setReplyMarkup(keyboardMarkup);
     try {
       execute(sendMessage);
     } catch (TelegramApiException e) {
@@ -183,4 +196,15 @@ public class Bot extends TelegramLongPollingCommandBot {
       log.error("error occurred: " + e.getMessage());
     }
   }
+
+  private void filterMan(long chatId){
+    SendMessage message = new SendMessage();
+    message.setChatId(chatId);
+
+  }
+  private void filterWoman(long chatId){
+    SendMessage message = new SendMessage();
+    message.setChatId(chatId);
+  }
+
 }
