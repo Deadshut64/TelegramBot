@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.helpCommand.HelpCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -75,45 +76,64 @@ public class Bot extends TelegramLongPollingCommandBot {
           case "/start":
             registerCustomer(u.getMessage());
             startCommand(chatID, u.getMessage().getChat().getFirstName());
-            keyboardGender(chatID,u.getMessage().getText());
+            keyboardGender(chatID, u.getMessage().getText());
             break;
           case "/help":
             helpCommand(chatID);
             break;
           case "/filtersizeS":
           case "/list":
-            keyboardTest(chatID,u.getMessage().getText());
           case "/buy":
           case "/filtersizeI":
           case "/filterseason":
           case "/deletedata":
-          case "/man":
-            filterMan(chatID);
-            break;
-          case "/woman":
-            filterWoman(chatID);
-            break;
           case "/mydata":
+            break;
+          case "/man":
+          case "/woman":
+            keyboardSize(chatID, u.getMessage().getText());
             break;
           default:
             sendMessage(chatID, "Извините, данная команда не поддерживается");
+        }
+      } else if (u.hasCallbackQuery()) {
+        String callBackData = u.getCallbackQuery().getData();
+        long messageId = u.getCallbackQuery().getMessage().getMessageId();
+        long chatId = u.getCallbackQuery().getMessage().getChatId();
+        if (callBackData.equals("/man")) {
+          EditMessageText editMessageText = new EditMessageText();
+          editMessageText.setChatId(chatId);
+          editMessageText.setText("/man");
+          editMessageText.setMessageId((int) (messageId));
+          try {
+            execute(editMessageText);
+          } catch (TelegramApiException e) {
+            log.error("error occurred: " + e.getMessage());}
+
+        } else if (callBackData.equals("/woman")) {
+          EditMessageText editMessageText = new EditMessageText();
+          editMessageText.setChatId(chatId);
+          editMessageText.setText("/woman");
+          editMessageText.setMessageId((int) (messageId));
+          try {
+            execute(editMessageText);
+          } catch (TelegramApiException e) {
+            log.error("error occurred: " + e.getMessage());
+          }
         }
       }
     }
   }
 
   private void registerCustomer(Message message) {
-
     if (customerRepository.findById(message.getChatId()).isEmpty()) {
-
       var chatId = message.getChatId();
       var chat = message.getChat();
-
-      Customer customer = new Customer();
-      customer.setChat_id(chatId);
+        Customer customer = new Customer();
+          customer.setChat_id(chatId);
       if (customer.getCustomer_name() == null) {
-        customer.setCustomer_name("customer without a name");
-        customer.setRegistration(new Timestamp(System.currentTimeMillis()));
+          customer.setCustomer_name("customer without a name");
+           customer.setRegistration(new Timestamp(System.currentTimeMillis()));
         customerRepository.save(customer);
         log.info("Пользователь " + customer + "сохранен");
       }
@@ -165,10 +185,10 @@ public class Bot extends TelegramLongPollingCommandBot {
       List<InlineKeyboardButton> rowInLine = new ArrayList<>();
          var buttonMan = new InlineKeyboardButton();
              buttonMan.setText("Мальчик");
-             buttonMan.setCallbackData("Man");
+             buttonMan.setCallbackData("/man");
          var buttonWoman = new InlineKeyboardButton();
              buttonWoman.setText("Девочка");
-             buttonWoman.setCallbackData("Woman");
+             buttonWoman.setCallbackData("/woman");
          rowInLine.add(buttonMan);
          rowInLine.add(buttonWoman);
         rowsInLine.add(rowInLine);
@@ -180,16 +200,26 @@ public class Bot extends TelegramLongPollingCommandBot {
       log.error("error occurred: " + e.getMessage());
     }
   }
-  private void keyboardTest(long chatID, String text) {
+  private void keyboardSize(long chatID, String text) {
     SendMessage sendMessage = new SendMessage(String.valueOf(chatID), text);
-    ReplyKeyboardMarkup replyKeyboard = new ReplyKeyboardMarkup();
-    List<KeyboardRow> keyboardRows = new ArrayList<>();
-    KeyboardRow row = new KeyboardRow();
-    row.add("другая кнопка");
-    row.add("другая кнопка2");
-    keyboardRows.add(row);
-    replyKeyboard.setKeyboard(keyboardRows);
-    sendMessage.setReplyMarkup(replyKeyboard);
+    InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+    List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+    List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+    var button = new InlineKeyboardButton();
+    button.setText("16-17");
+    button.setCallbackData("16");
+    var button2 = new InlineKeyboardButton();
+    button2.setText("18-20");
+    button2.setCallbackData("18");
+    var button3 = new InlineKeyboardButton();
+    button3.setText("21-22");
+    button3.setCallbackData("21");
+    rowInLine.add(button);
+    rowInLine.add(button2);
+    rowInLine.add(button3);
+    rowsInLine.add(rowInLine);
+    keyboardMarkup.setKeyboard(rowsInLine);
+    sendMessage.setReplyMarkup(keyboardMarkup);
     try {
       execute(sendMessage);
     } catch (TelegramApiException e) {
@@ -206,5 +236,6 @@ public class Bot extends TelegramLongPollingCommandBot {
     SendMessage message = new SendMessage();
     message.setChatId(chatId);
   }
+
 
 }
