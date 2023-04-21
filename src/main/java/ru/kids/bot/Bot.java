@@ -7,9 +7,12 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.helpCommand.HelpCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.kids.bot.model.Customer;
@@ -66,43 +69,38 @@ public class Bot extends TelegramLongPollingCommandBot {
   public void onUpdatesReceived(List<Update> updates) {
     super.onUpdatesReceived(updates);
     for (Update u : updates) {
-      if (u.hasMessage()) {
-        long chatID = u.getMessage().getChatId();
+      if (u.hasMessage() | u.hasCallbackQuery()) {
+        long chatId = u.getMessage().getChatId();
         String message = u.getMessage().getText();
         switch (message) {
           case "/start":
             registerCustomer(u.getMessage());
-            startCommand(chatID, u.getMessage().getChat().getFirstName());
-            keyboardGender(chatID,u.getMessage().getText());
+            startCommand(chatId, u.getMessage().getChat().getFirstName());
+            keyboardGender(chatId, "Выберите пожалуйста пол ребенка");
+            onCallBackDataGender(updates);
             break;
           case "/help":
-            helpCommand(chatID);
+            helpCommand(chatId);
             break;
           case "/filtersizeS":
           case "/list":
-            keyboardTest(chatID,u.getMessage().getText());
           case "/buy":
           case "/filtersizeI":
           case "/filterseason":
           case "/deletedata":
-          case "/man":
-          case "/woman":
           case "/mydata":
             break;
           default:
-            sendMessage(chatID, "Извините, данная команда не поддерживается");
+            sendMessage(chatId, "Извините, данная команда не поддерживается");
         }
       }
     }
   }
 
   private void registerCustomer(Message message) {
-
     if (customerRepository.findById(message.getChatId()).isEmpty()) {
-
       var chatId = message.getChatId();
       var chat = message.getChat();
-
       Customer customer = new Customer();
       customer.setChat_id(chatId);
       if (customer.getCustomer_name() == null) {
@@ -120,11 +118,12 @@ public class Bot extends TelegramLongPollingCommandBot {
   }
 
   private void startCommand(long chatID, String name) {
-    String answer = EmojiParser.parseToUnicode("Здраствуйте " + name + " :blush:, выберите пожалуйста пол ребенка ");
+    String answer = EmojiParser.parseToUnicode("Здраствуйте " + name + " :blush:");
     if (name == null) {
-      sendMessage(chatID, EmojiParser.parseToUnicode("Здраствуйте :blush:, выберите пожалуйста пол ребенка "));
+      sendMessage(chatID, EmojiParser.parseToUnicode("Здраствуйте :blush:"));
+    } else {
+      sendMessage(chatID, answer);
     }
-    sendMessage(chatID, answer);
   }
 
   private void helpCommand(long chatID) {
@@ -153,34 +152,92 @@ public class Bot extends TelegramLongPollingCommandBot {
 
   private void keyboardGender(long chatID, String text) {
     SendMessage sendMessage = new SendMessage(String.valueOf(chatID), text);
-    ReplyKeyboardMarkup replyKeyboard = new ReplyKeyboardMarkup();
-     List<KeyboardRow> keyboardRows = new ArrayList<>();
-      KeyboardRow row = new KeyboardRow();
-        row.add("Мальчик");
-        row.add("Девочка");
-      keyboardRows.add(row);
-     replyKeyboard.setKeyboard(keyboardRows);
-    sendMessage.setReplyMarkup(replyKeyboard);
+    InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+    List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+    List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+    var buttonMan = new InlineKeyboardButton();
+    buttonMan.setCallbackData("man");
+    buttonMan.setText("Мальчик");
+    var buttonWoman = new InlineKeyboardButton();
+    buttonWoman.setCallbackData("woman");
+    buttonWoman.setText("Девочка");
+    rowInLine.add(buttonMan);
+    rowInLine.add(buttonWoman);
+    rowsInLine.add(rowInLine);
+    keyboardMarkup.setKeyboard(rowsInLine);
+    sendMessage.setReplyMarkup(keyboardMarkup);
     try {
       execute(sendMessage);
     } catch (TelegramApiException e) {
       log.error("error occurred: " + e.getMessage());
     }
   }
-  private void keyboardTest(long chatID, String text) {
+
+  private void keyboardSize(long chatID, String text) {
     SendMessage sendMessage = new SendMessage(String.valueOf(chatID), text);
-    ReplyKeyboardMarkup replyKeyboard = new ReplyKeyboardMarkup();
-    List<KeyboardRow> keyboardRows = new ArrayList<>();
-    KeyboardRow row = new KeyboardRow();
-    row.add("другая кнопка");
-    row.add("другая кнопка2");
-    keyboardRows.add(row);
-    replyKeyboard.setKeyboard(keyboardRows);
-    sendMessage.setReplyMarkup(replyKeyboard);
+    InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+    List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+    List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+    var button = new InlineKeyboardButton();
+    button.setText("16-17");
+    button.setCallbackData("16");
+    var button2 = new InlineKeyboardButton();
+    button2.setText("18-20");
+    button2.setCallbackData("18");
+    var button3 = new InlineKeyboardButton();
+    button3.setText("21-22");
+    button3.setCallbackData("21");
+    rowInLine.add(button);
+    rowInLine.add(button2);
+    rowInLine.add(button3);
+    rowsInLine.add(rowInLine);
+    keyboardMarkup.setKeyboard(rowsInLine);
+    sendMessage.setReplyMarkup(keyboardMarkup);
     try {
       execute(sendMessage);
     } catch (TelegramApiException e) {
       log.error("error occurred: " + e.getMessage());
+    }
+  }
+
+  private void filterMan(long chatId) {
+    SendMessage message = new SendMessage();
+    message.setChatId(chatId);
+
+  }
+
+  private void filterWoman(long chatId) {
+    SendMessage message = new SendMessage();
+    message.setChatId(chatId);
+  }
+
+  private void onCallBackDataGender(List<Update> updates) {
+    for (Update u : updates) {
+      if (u.hasCallbackQuery()) {
+        String callBackData = u.getCallbackQuery().getData();
+        long messageId = u.getCallbackQuery().getMessage().getMessageId();
+        long chatId = u.getCallbackQuery().getMessage().getChatId();
+        EditMessageText editMessageText = new EditMessageText();
+        editMessageText.setChatId(chatId);
+        editMessageText.setMessageId((int) (messageId));
+        if (callBackData.equals("man")) {
+          keyboardSize(chatId, u.getMessage().getText());
+          try {
+            execute(editMessageText);
+          } catch (TelegramApiException e) {
+            log.error("error occurred: " + e.getMessage());
+          }
+
+        } else if (callBackData.equals("woman")) {
+          keyboardSize(chatId, u.getMessage().getText());
+          try {
+            execute(editMessageText);
+          } catch (TelegramApiException e) {
+            log.error("error occurred: " + e.getMessage());
+
+          }
+        }
+      }
     }
   }
 }
