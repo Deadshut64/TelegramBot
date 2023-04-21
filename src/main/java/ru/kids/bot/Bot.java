@@ -2,8 +2,6 @@ package ru.kids.bot;
 
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.helpCommand.HelpCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -11,9 +9,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.kids.bot.model.Customer;
 import ru.kids.bot.model.CustomerRepository;
@@ -76,8 +72,7 @@ public class Bot extends TelegramLongPollingCommandBot {
           case "/start":
             registerCustomer(u.getMessage());
             startCommand(chatId, u.getMessage().getChat().getFirstName());
-            keyboardGender(chatId, "Выберите пожалуйста пол ребенка");
-            onCallBackDataGender(updates);
+            keyboardGender(chatId, "Выберите пол ребенка");
             break;
           case "/help":
             helpCommand(chatId);
@@ -168,6 +163,7 @@ public class Bot extends TelegramLongPollingCommandBot {
     sendMessage.setReplyMarkup(keyboardMarkup);
     try {
       execute(sendMessage);
+      onCallBackDataGender();
     } catch (TelegramApiException e) {
       log.error("error occurred: " + e.getMessage());
     }
@@ -211,8 +207,9 @@ public class Bot extends TelegramLongPollingCommandBot {
     message.setChatId(chatId);
   }
 
-  private void onCallBackDataGender(List<Update> updates) {
-    for (Update u : updates) {
+  private void onCallBackDataGender() {
+    Update u = new Update();
+    u.getCallbackQuery().getMessage().getChatId();
       if (u.hasCallbackQuery()) {
         String callBackData = u.getCallbackQuery().getData();
         long messageId = u.getCallbackQuery().getMessage().getMessageId();
@@ -240,4 +237,3 @@ public class Bot extends TelegramLongPollingCommandBot {
       }
     }
   }
-}
